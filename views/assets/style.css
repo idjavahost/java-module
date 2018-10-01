@@ -122,6 +122,9 @@ div.java-tab-menu div.list-group>a {
 div.java-tab-menu div.list-group>a .jicon,
 div.java-tab-menu div.list-group>a .fa {
     color: #5A55A3;
+    font-size: 26px;
+    line-height: 10px;
+    margin-bottom: 0;
 }
 
 div.java-tab-menu div.list-group>a:first-child {

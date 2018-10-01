@@ -67,6 +67,7 @@ var config = {
         ],
         options: {
             compatibility: "ie8",
+            rebaseTo: dir_pub,
             level: {1: {specialComments: 0}}
         },
         base: dir_pub,
