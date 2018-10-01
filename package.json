@@ -1,0 +1,24 @@
+{
+  "name": "java-opensid-module",
+  "version": "1.0.0",
+  "description": "JavaHost OpenSID Module for Configure Java Themes",
+  "main": "gulpfile.js",
+  "repository": "https://github.com/idjavahost/java-module",
+  "author": "Rizal Fauzie <rizal@fauzie.my.id>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-clean-css": "^3.10.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-strip-comments": "^2.5.2",
+    "gulp-uglify": "^3.0.1",
+    "gulp-watch": "^5.0.1"
+  },
+  "dependencies": {
+    "bootstrap-toggle": "^2.2.2"
+  }
+}
