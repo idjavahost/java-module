@@ -19,6 +19,8 @@
     "gulp-watch": "^5.0.1"
   },
   "dependencies": {
+    "bootstrap-colorpicker": "2",
+    "bootstrap-select": "^1.13.2",
     "bootstrap-toggle": "^2.2.2"
   }
 }

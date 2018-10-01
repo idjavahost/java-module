@@ -20,7 +20,7 @@ class Java_options_builder {
             return '';
         }
 
-        $type_builder = '_build_'.$data['type'];
+        $type_builder = '_render_'.$data['type'];
 
         if ( method_exists( $this, $type_builder ) ) {
             return call_user_func(array( $this, $type_builder ), $data);

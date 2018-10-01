@@ -156,8 +156,7 @@ div.java-tab-menu div.list-group>a.active:after {
 
 div.java-tab-content {
     background-color: #ffffff;
-    padding-left: 20px;
-    padding-top: 10px;
+    padding-top: 15px;
 }
 
 div.java-tab div.java-tab-content:not(.active) {

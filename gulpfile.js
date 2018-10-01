@@ -6,6 +6,13 @@
  * @author  Rizal Fauzie <fauzie@idjavahost.com>
  */
 
+/**
+ * === RESOURCES
+ * - Color Picker : https://farbelous.io/bootstrap-colorpicker/v2/
+ * - Checkbox Toggle : http://www.bootstraptoggle.com/
+ * - Select : https://developer.snapappointments.com/bootstrap-select/
+ */
+
 var dir_node = './node_modules',
     dir_pub  = './views/assets'
     ;
@@ -37,12 +44,15 @@ var config = {
 
     uglify: {
         src: [
+            dir_node + '/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.js',
             dir_node + '/bootstrap-toggle/js/bootstrap-toggle.js',
+            dir_node + '/bootstrap-select/dist/js/bootstrap-select.js',
+            dir_node + '/bootstrap-select/dist/js/i18n/defaults-id_ID.js',
             dir_pub + '/script.js'
         ],
         options: {
             ie8: true,
-            warnings: true
+            warnings: false
         },
         base: dir_pub,
         name: 'script.min.js'
@@ -50,8 +60,10 @@ var config = {
 
     css: {
         src: [
-            dir_pub + '/style.css',
-            dir_node + 'bootstrap-toggle/css/bootstrap-toggle.css'
+            dir_node + 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.css',
+            dir_node + 'bootstrap-toggle/css/bootstrap-toggle.css',
+            dir_node + '/bootstrap-select/dist/css/bootstrap-select.css',
+            dir_pub + '/style.css'
         ],
         options: {
             compatibility: "ie8",

@@ -12,6 +12,14 @@ $config['general'] = array(
             'value' => '1',
             'default' => '1',
             'help' => 'Aktifkan pratampil tema untuk melihat sekilas tema anda.'
+        ),
+        array(
+            'id' => 'enable',
+            'label' => 'Aktifkan Tema',
+            'type' => 'toggle',
+            'value' => '1',
+            'default' => '1',
+            'help' => 'Aktifkan pratampil tema untuk melihat sekilas tema anda.'
         )
     )
 );
