@@ -10,7 +10,10 @@
 // Base constant
 define('JAVAPATH', __DIR__);
 define('JAVADIR', 'vendor/java');
-
+if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+define('JAVAUPLOAD', FCPATH.'desa'.DS.'upload'.DS.'theme'.DS);
 
 // Include everything on this module.
-get_instance()->load->add_package_path(JAVAPATH);
+if(function_exists('get_instance')) get_instance()->load->add_package_path(JAVAPATH);
+// Java Event listener required to load first.
+if(!class_exists('Java_events')) include_once(JAVAPATH.'/libraries/Java_events.php');

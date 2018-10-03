@@ -92,12 +92,14 @@ if (isset($_GET['action'])) {
                     `config_key` varchar(255) NULL,
                     `config_value` text NULL,
                     `update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE `UNIQUE_KEY` (`config_key`),
                     PRIMARY KEY (`id`)
                 ) ENGINE=InnoDB;
                 ");
 
                 $file_data  = file_get_contents($configfile);
-                $file_data .= "\n\nrequire_once FCPATH.'vendor/java/autoload.php';\n";
+                $file_data .= "\n\nif (!defined('FCPATH')) define('FCPATH', dirname(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR);";
+                $file_data .= "\nrequire_once FCPATH.'vendor/java/autoload.php';\n";
                 file_put_contents($configfile, $file_data);
 
                 $response['data'] = array();

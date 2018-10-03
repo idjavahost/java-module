@@ -87,6 +87,59 @@
 .icon-palette:before {
   content: "\e914";
 }
+.java-copyright a {
+    color: #999;
+}
+.java-copyright {
+    padding: 10px 15px;
+    color: #afafaf;
+    font-size: 13px;
+}
+@-webkit-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+div.java-tab-container.is-loading {
+    position: relative;
+    overflow: hidden;
+}
+div.java-tab-container.is-loading:before {
+    content: "";
+    background-color: rgba(255,255,255,.8);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 19;
+}
+div.java-tab-container.is-loading:after {
+    content: "\e906";
+    color: #d2d2d2;
+    font-family: 'JavaIconFont';
+    font-size: 80px;
+    margin: -40px 0 0 -40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+    -webkit-animation: spinner .75s infinite linear;
+    animation: spinner .75s infinite linear
+}
 /*  java tab */
 div.java-tab-container {
     z-index: 10;
@@ -97,6 +150,7 @@ div.java-tab-container {
     border: 1px solid #ddd;
     margin-top: 20px;
     margin-left: 0;
+    min-height: 400px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
     -moz-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
@@ -106,9 +160,32 @@ div.java-tab-container {
 }
 
 div.java-tab-menu {
+    background-color: #3b4c52;
+    box-shadow: inset 0 0 15px rgba(0,0,0,.8);
     padding-right: 0;
     padding-left: 0;
     padding-bottom: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.java-tab-heading {
+    color: #5f5aa6;
+    background: #fcfcfc;
+    background: -moz-linear-gradient(top, #fcfcfc 0%, #efefef 40%, #dddddd 100%);
+    background: -webkit-linear-gradient(top, #fcfcfc 0%,#efefef 40%,#dddddd 100%);
+    background: linear-gradient(to bottom, #fcfcfc 0%,#efefef 40%,#dddddd 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#dddddd',GradientType=0 );
+    display: block;
+    border-bottom: 1px solid #eee;
+    margin: -15px -15px 15px;
+    padding: 15px 20px;
+}
+
+.java-tab-heading strong {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -2px;
 }
 
 div.java-tab-menu div.list-group {
@@ -160,8 +237,126 @@ div.java-tab-menu div.list-group>a.active:after {
 div.java-tab-content {
     background-color: #ffffff;
     padding-top: 15px;
+    margin-bottom: 80px;
 }
 
-div.java-tab div.java-tab-content:not(.active) {
+div.java-tab .java-tab-content:not(.active) {
     display: none;
+}
+
+div.java-tab .form-submit {
+    background: #fcfcfc;
+    background: -moz-linear-gradient(top, #fcfcfc 0%, #efefef 40%, #dddddd 100%);
+    background: -webkit-linear-gradient(top, #fcfcfc 0%,#efefef 40%,#dddddd 100%);
+    background: linear-gradient(to bottom, #fcfcfc 0%,#efefef 40%,#dddddd 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#dddddd',GradientType=0 );
+    border-top: 1px solid #eee;
+    display: block;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    padding: 15px;
+    text-align: right;
+}
+
+div.java-tab .form-submit .btn-success {
+    background-color: #5a55a3;
+    border-color: #38338a;
+}
+
+div.java-tab .form-submit .btn-success:hover,
+div.java-tab .form-submit .btn-success:focus {
+    background-color: #444;
+    border-color: #222;
+}
+
+#java-options-form .control-label {
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#java-options-form .control-label .required {
+    display: inline-block;
+    width: 12px;
+    font-size: 16px;
+    line-height: 10px;
+    font-weight: 900;
+    color: red;
+}
+
+#java-options-form .control-label .help-tip {
+    display: inline-block;
+    color: #4290be;
+    margin-left: 5px;
+    margin-bottom: -5px;
+    font-size: 15px;
+    line-height: 10px;
+    vertical-align: sub;
+}
+
+#java-options-form .form-group {
+    border-bottom: 1px solid #eee;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 0;
+}
+#java-options-form .form-group .help-block {
+    margin-bottom: 0;
+}
+
+#java-options-form fieldset .form-group:first-child {
+    padding-top: 0;
+}
+
+#java-options-form fieldset .form-group:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+#java-options-form .uploader-input .form-group {
+    margin-right: 0;
+    margin-bottom: 0;
+    padding: 2px 0;
+    border: 0;
+}
+
+div.java-tab-container .message-wrap {
+    padding: 0;
+    margin: 0;
+}
+
+div.java-tab-container .message-wrap .alert {
+    margin: 0;
+    border-radius: 0;
+    font-size: 12px;
+    opacity: .9;
+}
+
+.select2-container--bootstrap .select2-selection,
+.select2-container--bootstrap .select2-search--dropdown .select2-search__field {
+    border-radius: 0;
+}
+
+.select2-container--bootstrap .select2-dropdown,
+.select2-container--bootstrap .select2-selection,
+.select2-container--bootstrap.select2-container--focus .select2-selection,
+.select2-container--bootstrap.select2-container--open .select2-selection {
+    box-shadow: none;
+}
+
+.select2-container--bootstrap .select2-selection--single .select2-selection__rendered {
+    padding-top: 4px;
+}
+
+#java-options-form .form-group span.slider-value {
+    background-color: #eeeeee;
+    border: 1px solid #ccc;
+    color: #333;
+    display: inline-block;
+    margin-left: 15px;
+    font-size: 14px;
+    line-height: 18px;
+    padding: 2px 8px;
 }

@@ -1,5 +1,11 @@
-<?php
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * JavaHost OpenSID Module.
+ *
+ * @since       0.0.1
+ * @author      Rizal Fauzie <rizal@fauzie.my.id>
+ * @copyright   PT. Java Digital Nusantara © 2018
+ */
 
 class Java_theme extends CI_Controller {
 
@@ -7,6 +13,7 @@ class Java_theme extends CI_Controller {
 	{
 		parent::__construct();
         session_start();
+        $this->modul_ini = 13;
         $this->load->model('user_model');
 		$grup	= $this->user_model->sesi_grup($_SESSION['sesi']);
 		if ($grup != 1 AND $grup != 2 AND $grup != 3)
@@ -18,10 +25,162 @@ class Java_theme extends CI_Controller {
 			redirect('siteman');
 		}
 		$this->load->model('header_model');
+        $this->load->model('web_artikel_model');
+        $this->load->library('java_theme_config');
+        $this->load->helper('java');
     }
 
     public function index()
     {
-        echo '<h1>Theme Options</h1>';
+        $data = array('p'=>1,'o'=>1,'cat'=>0);
+
+        $nav['act'] = 13;
+		$nav['act_sub'] = 201;
+        $header = $this->header_model->get_data();
+
+		$data['main'] = $this->java_theme_config->get_configs();
+		$data['builder'] = $this->java_theme_config->get_builder();
+
+        $this->load->view('header', $header);
+		$this->load->view('nav', $nav);
+		$this->load->view('java/index', $data);
+		$this->load->view('footer');
+    }
+
+    public function save()
+    {
+        $response = array('success' => false);
+
+        if ($postdata = $this->input->post()) {
+            if (!$this->java_theme_config->save_config($postdata)) {
+                $response['message'] = $this->java_theme_config->last_error();
+            } else {
+                $response['success'] = true;
+            }
+        }
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($response); exit();
+    }
+
+    public function upload($group, $field)
+    {
+        $found = false;
+        $is_image = false;
+        $configs = $this->java_theme_config->get_configs();
+        $response = array('status' => 'fail', 'message' => 'File gagal di upload.');
+        $max_size = java_file_upload_max_size();
+        $max_w = 0;
+        $max_h = 0;
+        $types = '';
+        $relpath = '';
+
+        if (isset($configs[ $group ]) && isset($configs[ $group ]['fields'])) {
+            foreach ($configs[ $group ]['fields'] as $fkey => $fdata) {
+                if ($fdata['id'] == $field && $fdata['type'] == 'upload') {
+                    if (isset($fdata['filepath'])) $relpath = trim($fdata['filepath'],'/');
+                    if (isset($fdata['extensions'])) $types = implode($fdata['extensions'],'|');
+                    if (isset($fdata['maxsize'])) $max_size = intval($fdata['maxsize']);
+                    if ($fdata['filetype'] == 'image') {
+                        if (isset($fdata['maxwidth'])) $max_w = intval($fdata['maxwidth']);
+                        if (isset($fdata['maxheight'])) $max_h = intval($fdata['maxheight']);
+                        $is_image = true;
+                    }
+                    $found = true;
+                    break;
+                }
+            }
+        }
+
+        if ($found !== false && !empty($_FILES['file'])) {
+            try {
+                $fullpath = JAVAUPLOAD.$relpath.DS;
+
+                if (!is_dir($fullpath)) {
+                    mkdir($fullpath, 0777, true);
+                }
+
+                if (is_array($_FILES['file']['error'])) {
+                    throw new RuntimeException('Parameter salah.');
+                }
+
+                switch ($_FILES['file']['error']) {
+                    case UPLOAD_ERR_OK:
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        throw new RuntimeException('Tidak ada file terkirim.');
+                    case UPLOAD_ERR_INI_SIZE:
+                    case UPLOAD_ERR_FORM_SIZE:
+                        throw new RuntimeException('Ukuran file melebihi yang diperbolehkan.');
+                    default:
+                        throw new RuntimeException('Error tidak diketahui.');
+                }
+
+                $uploadconf = array(
+                    'upload_path'       => $fullpath,
+                    'allowed_types'     => $types,
+                    'max_size'          => $max_size,
+                    'file_ext_tolower'  => true,
+                    'overwrite'         => true,
+                    'remove_spaces'     => true
+                );
+                $this->load->library('upload', $uploadconf);
+
+                if (!$this->upload->do_upload('file')) {
+
+                    if (file_exists($fullpath.$_FILES['file']['name'])) {
+                        unlink($fullpath.$_FILES['file']['name']);
+                    }
+
+                    if (!move_uploaded_file(
+                        $_FILES['file']['tmp_name'],
+                        $fullpath.$_FILES['file']['name']
+                    )) {
+                        throw new RuntimeException('Gagal mengunggah berkas.');
+                    }
+
+                    $image_data = array(
+                        'rel_path'  => $relpath,
+                        'file_path' => $fullpath,
+                        'full_path' => $fullpath.$_FILES['file']['name'],
+                        'file_name' => $_FILES['file']['name']
+                    );
+
+                } else {
+                    $image_data = (array)$this->upload->data();
+                    $image_data['rel_path'] = $relpath;
+                }
+
+                if ($is_image && $max_w>1 && $max_h>1) {
+                    $imgconf = array(
+                        'source_image'      => $image_data['full_path'],
+                        'new_image'         => 'favicon',
+                        'maintain_ratio'    => true,
+                        'create_thumb'      => false,
+                        'quality'           => '80%',
+                        'width'             => $max_w,
+                        'height'            => $max_h
+                    );
+                    $this->load->library('image_lib', $config);
+
+                    if (!$this->image_lib->resize()) {
+                        throw new RuntimeException($this->image_lib->display_errors('',''));
+                    }
+                    log_message('debug', print_r(array('image'=>$is_image, 'w' => $max_w, 'h' => $max_h),true));
+                }
+
+                $response = array(
+                    'status' => 'success',
+                    'message' => 'Upload success!',
+                    'data' => $image_data
+                );
+
+            } catch (RuntimeException $e) {
+                $response['message'] = $e->getMessage() . $fullpath;
+            } catch (Exception $e) {}
+        }
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($response); exit();
     }
 }

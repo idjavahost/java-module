@@ -10,7 +10,8 @@
  * === RESOURCES
  * - Color Picker : https://farbelous.io/bootstrap-colorpicker/v2/
  * - Checkbox Toggle : http://www.bootstraptoggle.com/
- * - Select : https://developer.snapappointments.com/bootstrap-select/
+ * - File Uploader : https://danielmg.org/demo/java-script/uploader
+ * - Slider : https://github.com/seiyria/bootstrap-slider
  */
 
 var dir_node = './node_modules',
@@ -46,8 +47,9 @@ var config = {
         src: [
             dir_node + '/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.js',
             dir_node + '/bootstrap-toggle/js/bootstrap-toggle.js',
-            dir_node + '/bootstrap-select/dist/js/bootstrap-select.js',
-            dir_node + '/bootstrap-select/dist/js/i18n/defaults-id_ID.js',
+            dir_node + '/dm-file-uploader/src/js/jquery.dm-uploader.js',
+            dir_node + '/bootstrap-slider/dist/bootstrap-slider.js',
+            dir_pub + '/helper.js',
             dir_pub + '/script.js'
         ],
         options: {
@@ -60,9 +62,11 @@ var config = {
 
     css: {
         src: [
-            dir_node + 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.css',
-            dir_node + 'bootstrap-toggle/css/bootstrap-toggle.css',
-            dir_node + '/bootstrap-select/dist/css/bootstrap-select.css',
+            dir_node + '/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.css',
+            dir_node + '/select2-bootstrap-theme/dist/select2-bootstrap.css',
+            dir_node + '/bootstrap-toggle/css/bootstrap-toggle.css',
+            dir_node + '/dm-file-uploader/src/css/jquery.dm-uploader.css',
+            dir_node + '/bootstrap-slider/dist/css/bootstrap-slider.css',
             dir_pub + '/style.css'
         ],
         options: {
@@ -91,6 +95,7 @@ gulp.task('js', function(done) {
             console.log(e.cause);
          }))
 		.pipe(concat(config.uglify.name),{newLine: ""})
+		.pipe(strip())
 		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest(config.uglify.base))
         .on('end', done);
