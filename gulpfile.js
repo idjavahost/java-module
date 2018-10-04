@@ -49,6 +49,7 @@ var config = {
             dir_node + '/bootstrap-toggle/js/bootstrap-toggle.js',
             dir_node + '/dm-file-uploader/src/js/jquery.dm-uploader.js',
             dir_node + '/bootstrap-slider/dist/bootstrap-slider.js',
+            dir_node + '/sortablejs/Sortable.js',
             dir_pub + '/helper.js',
             dir_pub + '/script.js'
         ],

@@ -1,39 +1,47 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 /**
- * Events
+ * JavaHost OpenSID Module - Events Library.
  *
- * A simple events system for CodeIgniter.
- *
- * @package		CodeIgniter
- * @subpackage	Events
- * @version		1.0
- * @author		Eric Barnes <http://ericlbarnes.com>
- * @author		Dan Horrigan <http://dhorrigan.com>
- * @license		Apache License v2.0
- * @copyright	2010 Dan Horrigan
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * Events Library
+ * @since       0.0.1
+ * @author      Rizal Fauzie <rizal@fauzie.my.id>
+ * @copyright   PT. Java Digital Nusantara © 2018
  */
 class Java_events {
 
+    const DEBUG_NONE = 0;
+    const DEBUG_FILTERS = 1;
+    const DEBUG_ACTIONS = 2;
+    const DEBUG_ALL = 3;
+
 	/**
-	 * @var	array	An array of listeners
+	 * @var	array	An array of actions
 	 */
-	protected static $_listeners = array();
+	protected static $_actions = array();
+
+	/**
+	 * @var	array	An array of actions
+	 */
+	protected static $_filters = array();
+
+	/**
+	 * @var	int
+	 */
+	protected static $_debug_level = self::DEBUG_NONE;
+
+    protected static $_doing_action = false;
+    protected static $_doing_filter = false;
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Set debug level for backtrace on log file.
+     *
+     * @param int $level
+     */
+    public static function set_debug($level)
+    {
+        self::$_debug_level = (int)$level;
+    }
 
 	// ------------------------------------------------------------------------
 
@@ -43,116 +51,187 @@ class Java_events {
 	 * Registers a Callback for a given event
 	 *
 	 * @access	public
+	 * @param	string	action or filter
 	 * @param	string	The name of the event
 	 * @param	array	The callback for the Event
 	 * @return	void
 	 */
-	public static function register($event, array $callback)
+	public static function register($type, $event, $callback)
 	{
-		$key = get_class($callback[0]).'::'.$callback[1];
-		self::$_listeners[$event][$key] = $callback;
-		self::log_message('debug', 'Events::register() - Registered "'.$key.' with event "'.$event.'"');
+        $key = is_array($callback) ? get_class($callback[0]).'::'.$callback[1] : trim($callback);
+
+        switch ($type) {
+            case 'filter':
+                self::$_filters[$event][$key] = $callback;
+                if (self::$_debug_level == self::DEBUG_FILTERS || self::$_debug_level == self::DEBUG_ALL) {
+                    self::log_message('FILTER - Registered filter "'.$key.' with event "'.$event.'"');
+                }
+                break;
+            case 'action':
+                self::$_actions[$event][$key] = $callback;
+                if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+                    self::log_message('ACTION - Registered action "'.$key.' with event "'.$event.'"');
+                }
+                break;
+        }
 	}
 
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Trigger
+	 * Trigger actions.
 	 *
-	 * Triggers an event and returns the results.  The results can be returned
-	 * in the following formats:
-	 *
-	 * 'array'
-	 * 'json'
-	 * 'serialized'
-	 * 'string'
+	 * Triggers an action event. Return none.
 	 *
 	 * @access	public
 	 * @param	string	The name of the event
-	 * @param	mixed	Any data that is to be passed to the listener
-	 * @param	string	The return type
-	 * @return	mixed	The return of the listeners, in the return type
+	 * @param	mixed	Any data that is to be passed to the action
 	 */
-	public static function trigger($event, $data = '', $return_type = 'string')
+	public static function actions($event, $data = '')
 	{
-		self::log_message('debug', 'Events::trigger() - Triggering event "'.$event.'"');
+        $calls = $data;
 
-		$calls = array();
+		if (self::has_action($event) && self::$_doing_action != $event) {
 
-		if (self::has_listeners($event))
-		{
-			foreach (self::$_listeners[$event] as $listener)
-			{
-				if (is_callable($listener))
-				{
-					$calls[] = call_user_func($listener, $data);
+            self::$_doing_action = $event;
+
+            if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+                self::log_message('ACION - Triggering action "'.$event.'"');
+            }
+
+			foreach (self::$_actions[$event] as $key => $listener) {
+                if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+                    self::log_message('ACION - Running hook "'.$key.'" on event "'.$event.'"');
+                }
+				if (is_callable($listener)) {
+					$calls = call_user_func($listener, $data);
 				}
 			}
+
+            self::$_doing_action = false;
 		}
 
-		return self::_format_return($calls, $return_type);
+        return $calls;
 	}
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
 	/**
-	 * Format Return
+	 * Trigger filters.
 	 *
-	 * Formats the return in the given type
-	 *
-	 * @access	protected
-	 * @param	array	The array of returns
-	 * @param	string	The return type
-	 * @return	mixed	The formatted return
-	 */
-	protected static function _format_return(array $calls, $return_type)
-	{
-		self::log_message('debug', 'Events::_format_return() - Formating calls in type "'.$return_type.'"');
-
-		switch ($return_type)
-		{
-			case 'json':
-				return json_encode($calls);
-				break;
-			case 'serialized':
-				return serialize($calls);
-				break;
-			case 'string':
-				$str = '';
-				foreach ($calls as $call)
-				{
-					$str .= $call;
-				}
-				return $str;
-				break;
-			default:
-				return $calls;
-				break;
-		}
-
-		return FALSE;
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Has Listeners
-	 *
-	 * Checks if the event has listeners
+	 * Triggers an filter event. Return as is.
 	 *
 	 * @access	public
 	 * @param	string	The name of the event
-	 * @return	bool	Whether the event has listeners
+	 * @param	mixed	Any data that is to be passed to the action
 	 */
-	public static function has_listeners($event)
+	public static function filters($event, $data = '')
 	{
-		self::log_message('debug', 'Events::has_listeners() - Checking if event "'.$event.'" has listeners.');
+		if (self::has_filter($event) && self::$_doing_filter != $event) {
 
-		if (isset(self::$_listeners[$event]) AND count(self::$_listeners[$event]) > 0)
-		{
-			return TRUE;
+            self::$_doing_filter = $event;
+
+            if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+                self::log_message('FILTER - Triggering filter "'.$event.'"');
+            }
+
+			foreach (self::$_filters[$event] as $key => $listener) {
+                if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+                    self::log_message('FILTER - Running hook "'.$key.'" on event "'.$event.'"');
+                }
+				if (is_callable($listener)) {
+					$data = call_user_func($listener, $data);
+				}
+			}
+
+            self::$_doing_filter = false;
 		}
-		return FALSE;
+
+        return $data;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Remove Action
+	 *
+	 * Remove action from on action event.
+	 *
+	 * @access	public
+	 * @param	string	The name of the event
+	 * @return	bool	Whether the event has action
+	 */
+	public static function unset_action($event, $action)
+	{
+        if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+            self::log_message('ACTION - Removing action "'.$action.'" from event "'.$event.'".');
+        }
+        if (isset(self::$_actions[$event]) && isset(self::$_actions[$event][$action])) {
+            unset(self::$_actions[$event][$action]);
+            return true;
+        }
+        return false;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Remove Filter
+	 *
+	 * Unsert filter from an event.
+	 *
+	 * @access	public
+	 * @param	string	The name of the event
+	 * @return	bool	Whether the event has action
+	 */
+	public static function unset_filter($event, $filter)
+	{
+        if (self::$_debug_level == self::DEBUG_FILTERS || self::$_debug_level == self::DEBUG_ALL) {
+            self::log_message('ACTION - Removing filter "'.$filter.'" from event "'.$event.'".');
+        }
+        if (isset(self::$_filters[$event]) && isset(self::$_filters[$event][$filter])) {
+            unset(self::$_filters[$event][$filter]);
+            return true;
+        }
+        return false;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Has Action
+	 *
+	 * Checks if the event has action
+	 *
+	 * @access	public
+	 * @param	string	The name of the event
+	 * @return	bool	Whether the event has action
+	 */
+	public static function has_action($event)
+	{
+        if (self::$_debug_level == self::DEBUG_ACTIONS || self::$_debug_level == self::DEBUG_ALL) {
+            self::log_message('ACTION - Checking if event "'.$event.'" has actions.');
+        }
+        return (isset(self::$_actions[$event]) && count(self::$_actions[$event]) > 0);
+	}
+
+    // ------------------------------------------------------------------------
+
+	/**
+	 * Has Filter
+	 *
+	 * Checks if the event has filter
+	 *
+	 * @access	public
+	 * @param	string	The name of the event
+	 * @return	bool	Whether the event has filter
+	 */
+	public static function has_filter($event)
+	{
+        if (self::$_debug_level == self::DEBUG_FILTERS || self::$_debug_level == self::DEBUG_ALL) {
+            self::log_message('FILTER - Checking if event "'.$event.'" has filters.');
+        }
+        return (isset(self::$_filters[$event]) && count(self::$_filters[$event]) > 0);
 	}
 
 	// ------------------------------------------------------------------------
@@ -166,19 +245,24 @@ class Java_events {
 	 * @param string $message
 	 * @return void
 	 */
-	public static function log_message($type = 'debug', $message = '')
+	public static function log_message($message = '')
 	{
-		if (function_exists('log_message'))
-		{
-			log_message($type, $message);
+		if (function_exists('log_message')) {
+			log_message('debug', $message);
 		}
 	}
 }
 
-function java_register($event, array $object) {
-    Java_events::register($event, $object);
+function java_action($event, $object) {
+    Java_events::register('action', $event, $object);
 }
-function java_action($event, $data, $type = 'string') {
-    return Java_events::trigger($event, $data, $type);
+function java_filter($event, $object) {
+    Java_events::register('filter', $event, $object);
+}
+function java_actions($event, $data = '') {
+    return Java_events::actions($event, $data);
+}
+function java_filters($event, $data = '') {
+    return Java_events::filters($event, $data);
 }
 /* End of file Java_events.php */

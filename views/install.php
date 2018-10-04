@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 function is_server_connected() {
     $connected = fopen("http://www.google.com:80/","r");
     return ($connected);

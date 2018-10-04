@@ -78,6 +78,10 @@ class Java_theme_config {
         });
         foreach ($options as $groupkey => &$groupdata) {
             if (!isset($groupdata['fields'])) continue;
+            usort($groupdata['fields'], function($a, $b) {
+                if (!(isset($a['order']) && isset($b['order']))) return 1;
+                return isset($a['order']) && isset($b['order']) && ($a['order'] > $b['order']);
+            });
             foreach ($groupdata['fields'] as &$data) {
                 $dbkey = "$groupkey/".$data['id'];
                 if (isset($dbdata[ $dbkey ])) {

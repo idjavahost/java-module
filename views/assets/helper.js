@@ -62,3 +62,11 @@ $.fn.serializeObject = function() {
     });
     return json;
 };
+
+$.fn.sortable = function(options) {
+    var self = this,
+        opts = (typeof options === 'object') ? options : {},
+        sort = new Sortable(self, opts);
+    $(this).data('sortable', sort);
+    return this;
+};

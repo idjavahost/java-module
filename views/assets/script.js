@@ -113,10 +113,16 @@ $(function() {
         $('div.java-tab>div.java-tab-content').eq(index).addClass('active');
         if(history.pushState) history.pushState(null, null, id);
         else location.hash = id;
-        var myH = $('div.java-tab>div.java-tab-content').eq(index).height();
-        resizeTabNav(myH + 80);
+        resizeTabNav($(id).height() + 95);
         triggerPlugins(id);
     });
+
+    if (window.location.hash !== '' && $(window.location.hash).length) {
+        $('div.java-tab-menu>div.list-group>a').removeClass('active');
+        $('div.java-tab-menu>div.list-group>a[href="'+window.location.hash+'"]').addClass('active');
+        $('div.java-tab>div.java-tab-content').removeClass('active');
+        $('div.java-tab>div'+window.location.hash).addClass('active');
+    }
 
     window.javaForm = $('#java-options-form').validate({
         errorElement: 'small',
@@ -151,9 +157,10 @@ $(function() {
     });
 
     var resizeTabNav = function(hei) {
-        var fuH = $('.java-tab-container').height();
-        var wH = (typeof hei === 'undefined') ? fuH : (hei<fuH?fuH:hei);
-        $('.java-tab-menu,.java-tab').attr('style', '');
+        var fuH = $('.java-tab-content.active').height() + 95,
+            mH = $('div.java-tab-menu div.list-group').height(),
+            wH = (typeof hei === 'undefined') ? fuH : (hei<fuH?fuH:hei);
+        if(wH<mH) wH=mH;
         $('.java-tab-menu,.java-tab').css({'min-height':wH+'px'});
     };
 

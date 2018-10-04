@@ -1,6 +1,7 @@
+<?php if (!defined('JAVAPATH')) exit('No direct script access allowed'); ?>
 <link rel="stylesheet" href="<?= base_url().JAVADIR ?>/views/assets/style.min.css?ver=<?= time() ?>">
 <script type="text/javascript" src="<?= base_url().JAVADIR ?>/views/assets/script.min.js?ver=<?= time() ?>"></script>
-<?php echo java_action('java_theme_config_header', $main); ?>
+<?php java_actions('java_theme_config_header', $main); ?>
 <div class="content-wrapper">
 	<section class="content-header">
 		<h1>Theme Options</h1>
@@ -33,12 +34,12 @@
                                 <?php foreach ($groups['fields'] as $field): ?>
                                     <?php echo $builder->build($field, 'horizontal') ?>
                                 <?php endforeach; ?>
-                                <?php echo java_action('java_theme_config_'.$groupkey, $groups); ?>
+                                <?php java_actions('java_theme_config_fieldset_'.$groupkey, $groups); ?>
                                 </fieldset>
                             </div>
                         <?php $i++; endforeach; unset($i); ?>
                             <div class="form-submit">
-                                <?php echo java_action('java_theme_config_buttons', $main); ?>
+                                <?php java_actions('java_theme_config_buttons', $main); ?>
                                 <button type="reset" class="btn btn-default"><i class="jicon icon-renew"></i> <span>Reset</span></button>
                                 <button type="submit" class="btn btn-success"><i class="jicon icon-check"></i> <span>Simpan</span></button>
                             </div>
