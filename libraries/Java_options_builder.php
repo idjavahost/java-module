@@ -69,7 +69,14 @@ class Java_options_builder {
 
     protected function _label_render($type, $data, $field = '')
     {
-        $html = '<div class="form-group field-'.$this->_groupId.'--'.$data['id'].'">';
+        if ($data['type'] == 'separator') {
+            $html  = '<div class="form-group type-separator field-'.$this->_groupId.'--'.$data['id'].'">';
+            $html .= '<div class="col-xs-12"><h4>'.ucwords($data['label']).'</h4></div>';
+            $html .= '</div>';
+            return $html;
+        }
+
+        $html = '<div class="form-group type-'.$data['type'].' field-'.$this->_groupId.'--'.$data['id'].'">';
         $req = (isset($data['required']) && $data['required']===true) ? '<small class="required">*</small> ':'';
         $help = '';
         if (!empty($data['help']) && $data['type'] != 'toggle') {
@@ -93,6 +100,11 @@ class Java_options_builder {
         return $html;
     }
 
+    public function render_separator(array $data)
+    {
+        return '';
+    }
+
     public function render_toggle(array $data)
     {
         $attrs = array(
@@ -106,7 +118,7 @@ class Java_options_builder {
         if ($data['value'] == $attrs['value']) {
             $attrs['checked'] = 'checked';
         }
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
 
         if (!empty($data['options'])) {
             if (isset($data['options']['on']))
@@ -131,7 +143,7 @@ class Java_options_builder {
             'id'            => $this->_groupId.'-'.$data['id'],
             'class'         => 'form-control'
         );
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
         if (isset($data['min'])) $attrs['minlength'] = intval($data['min']);
         if (isset($data['max'])) $attrs['maxlength'] = intval($data['max']);
         if (isset($data['prefix']) || isset($data['suffix'])) {
@@ -156,7 +168,7 @@ class Java_options_builder {
         );
         $value = isset($data['value']) ? $data['value'] : (isset($data['default'])?$data['default']:'');
         $value = html_entity_decode($value);
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
         if (isset($data['min'])) $attrs['minlength'] = intval($data['min']);
         if (isset($data['max'])) $attrs['maxlength'] = intval($data['max']);
         return java_build_html('textarea', $attrs, $value);
@@ -171,7 +183,7 @@ class Java_options_builder {
             'id'            => $this->_groupId.'-'.$data['id'],
             'class'         => 'form-control'
         );
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
         if (isset($data['min'])) $attrs['min'] = intval($data['min']);
         if (isset($data['max'])) $attrs['max'] = intval($data['max']);
         if (isset($data['step'])) $attrs['step'] = intval($data['step']);
@@ -189,7 +201,7 @@ class Java_options_builder {
         );
         $value = isset($data['value']) ? $data['value'] : (isset($data['default'])?$data['default']:'');
         $value = html_entity_decode($value);
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
         if (isset($data['min'])) $attrs['minlength'] = intval($data['min']);
         if (isset($data['max'])) $attrs['maxlength'] = intval($data['max']);
         if (isset($data['editor'])) {
@@ -207,8 +219,13 @@ class Java_options_builder {
         $attrs = array(
             'name'          => $this->_groupId.'['.$data['id'].']',
             'id'            => $this->_groupId.'-'.$data['id'],
-            'class'         => 'form-control'
+            'class'         => 'form-control select-control'
         );
+        if (isset($data['multiple']) && $data['multiple']===true) {
+            $attrs['multiple'] = 'multiple';
+            $attrs['name'] = $this->_groupId.'['.$data['id'].'][]';
+            $value = explode(',', $value);
+        }
         if (!empty($data['select_options']) && is_array($data['select_options'])) {
             foreach ($data['select_options'] as $sokey => $sodata) {
                 $sokey = 'data-' . strtolower(htmlentities($sokey));
@@ -221,11 +238,15 @@ class Java_options_builder {
                 }
             }
         }
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
-        if (isset($data['multiple']) && $data['multiple']===true) $attrs['multiple'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
+
         $options = '';
         foreach ((array)$data['options'] as $opt_key => $opt_label) {
-            $selected = ($value == $opt_key) ? ' selected' : '';
+            if (isset($attrs['multiple']) && is_array($value)) {
+                $selected = (in_array(trim($opt_key), $value)) ? ' selected' : '';
+            } else {
+                $selected = ($value == $opt_key) ? ' selected' : '';
+            }
             $options .= '<option value="'.htmlentities($opt_key).'"'.$selected.'>'.htmlentities($opt_label).'</option>';
         }
         return java_build_html('select', $attrs, $options);
@@ -300,7 +321,7 @@ class Java_options_builder {
             'class'         => 'bootstrap-slider',
             'data-provide'  => 'slider'
         );
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
 
         if (!empty($data['slider']) && is_array($data['slider'])) {
             foreach ($data['slider'] as $skey => $svalue) {
@@ -329,7 +350,7 @@ class Java_options_builder {
             'autocomplete'  => 'off'
         );
         $config = array('color' => $val );
-        if (isset($data['required']) && $data['required']===true) $attrs['required'] = null;
+        if (isset($data['required']) && $data['required']===true) $attrs['required'] = 'required';
         if (isset($data['min'])) $attrs['minlength'] = intval($data['min']);
         if (isset($data['max'])) $attrs['maxlength'] = intval($data['max']);
         if (isset($data['format'])) $config['format'] = $data['format'];

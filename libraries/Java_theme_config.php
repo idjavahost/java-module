@@ -107,6 +107,9 @@ class Java_theme_config {
             foreach ($configs as $group => $fields) {
                 foreach ($fields as $key => $value) {
                     $dbkey = $group.'/'.$key;
+                    if (is_array($value)) {
+                        $value = implode(',', $value);
+                    }
                     if (isset($dbdata[ $dbkey ])) {
                         if ($dbdata[ $dbkey ] != $value) {
                             $updates[] = array(

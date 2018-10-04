@@ -380,3 +380,19 @@ div.java-tab-container .message-wrap .alert {
     line-height: 18px;
     padding: 2px 8px;
 }
+
+#java-options-form .form-group.type-separator {
+    background-color: #f1f1f1;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 1px solid #e0e0e0;
+    border-top: 1px solid #e0e0e0;
+}
+
+#java-options-form .form-group.type-separator h4 {
+    margin: 0;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #5f5aa6;
+}

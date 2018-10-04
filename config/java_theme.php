@@ -1,9 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-foreach (glob(FCPATH.'themes/java-*') as $javathemedir) {
-    if (file_exists($javathemedir.'/config.php')) {
-        include_once $javathemedir.'/config.php';
-    }
+if (file_exists(FCPATH.'themes/'.java_theme().'/config.php')) {
+    include_once FCPATH.'themes/'.java_theme().'/config.php';
 }
 
 $config['general'] = java_filters('java_theme_config_general', array(
@@ -15,17 +13,33 @@ $config['general'] = java_filters('java_theme_config_general', array(
             'id' => 'enable',
             'label' => 'Homepage Image',
             'type' => 'toggle',
-            'order' => 10,
+            'order' => 1,
             'value' => '1',
             'default' => '1',
             'options' => array('on' => 'On', 'off' => 'Off'),
             'help' => 'Aktifkan image slider pada halaman home.'
         ),
         array(
+            'id' => 'sosmed',
+            'label' => 'Tampilkan Sosmed',
+            'type' => 'toggle',
+            'order' => 10,
+            'value' => '1',
+            'default' => '1',
+            'options' => array('on' => 'On', 'off' => 'Off'),
+            'help' => 'Tampilkan sosial media ikon di header.'
+        ),
+        array(
+            'id' => 'logotext',
+            'label' => 'Teks Logo',
+            'order' => 20,
+            'help' => 'Akan ditampilan setelah gambar logo di header, kosongkan jika ingin menggunakan nama desa.'
+        ),
+        array(
             'id' => 'logo',
             'label' => 'Logo',
             'type' => 'upload',
-            'order' => 20,
+            'order' => 30,
             'filetype' => 'image',
             'filepath' => 'logo',
             'maxwidth' => 100,
@@ -33,37 +47,20 @@ $config['general'] = java_filters('java_theme_config_general', array(
             'extensions' => array('png', 'jpg'),
         ),
         array(
-            'id' => 'logotext',
-            'label' => 'Teks Logo',
-            'order' => 30,
-            'help' => 'Akan ditampilan setelah gambar logo di header, kosongkan jika ingin menggunakan nama desa.'
-        ),
-        array(
             'id' => 'favicon',
             'label' => 'Favicon',
             'type' => 'upload',
+            'help' => 'Unggah gambar yang cukup besar, akan otomatis membuat icon untuk safari tab, iphone, dan android icon.',
             'order' => 40,
             'filetype' => 'image',
             'filepath' => 'icon',
-            'maxwidth' => 50,
-            'maxheight' => 50,
-            'extensions' => array('png', 'ico'),
-        ),
-        array(
-            'id' => 'appleicon',
-            'label' => 'Apple Touch Icon',
-            'type' => 'upload',
-            'order' => 50,
-            'filetype' => 'image',
-            'filepath' => 'icon',
-            'maxwidth' => 180,
-            'maxheight' => 180,
+            'maxsize' => 2097152,
             'extensions' => array('png'),
         ),
         array(
             'id' => 'themecolor',
             'label' => 'Mobile Color',
-            'order' => 60,
+            'order' => 50,
             'help' => 'Digunakan untuk warna tema browser pada Android, iPhone, dan Windows Phone.',
             'type' => 'colorpicker',
             'default' => '#f1f1f1'
@@ -92,58 +89,6 @@ $config['sidebar'] = java_filters('java_theme_config_sidebar', array(
             'label' => 'Sidebar Artikel',
             'help' => 'Atur, urut, dan sesuaikan widget untuk sidebar kanan atau kiri di semua halaman artikel.',
             'type' => 'sidebar'
-        ),
-    )
-));
-
-$config['sosmed'] = java_filters('java_theme_config_sosmed', array(
-    'label'   => 'Sosial Media',
-    'icon'    => 'icon-announcement',
-    'order'   => 90,
-    'fields'  => array(
-        array(
-            'id' => 'enable',
-            'order' => 10,
-            'label' => 'Sosial Media',
-            'type' => 'toggle',
-            'value' => '1',
-            'default' => '1',
-            'help' => 'Tampilkan sosial media di header.'
-        ),
-        array(
-            'id' => 'facebook',
-            'order' => 20,
-            'label' => 'Facebook Page',
-            'prefix' => 'fa fa-facebook',
-            'default' => 'https://facebook.com/'
-        ),
-        array(
-            'id' => 'twitter',
-            'order' => 30,
-            'label' => 'Twitter Profile',
-            'prefix' => 'fa fa-twitter',
-            'default' => 'https://twitter.com/'
-        ),
-        array(
-            'id' => 'gplus',
-            'order' => 40,
-            'label' => 'Google Plus Page',
-            'prefix' => 'fa fa-google-plus',
-            'default' => 'https://plus.google.com/'
-        ),
-        array(
-            'id' => 'instagram',
-            'order' => 50,
-            'label' => 'Instagram URL',
-            'prefix' => 'fa fa-instagram',
-            'default' => 'https://instagram.com/'
-        ),
-        array(
-            'id' => 'youtube',
-            'order' => 60,
-            'label' => 'YouTube Channel',
-            'prefix' => 'fa fa-youtube',
-            'default' => 'https://youtube.com/'
         ),
     )
 ));

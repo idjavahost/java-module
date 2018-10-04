@@ -18,16 +18,16 @@
                         <div class="col-xs-12 message-wrap"></div>
                         <div class="col-sm-2 col-xs-3 java-tab-menu">
                           <div class="list-group">
-                           <?php $l=0; foreach ($main as $lkey => $ldata): ?>
-                             <a href="#<?= $lkey ?>-options" class="list-group-item text-center<?= ($l===0)?' active':'' ?>" tabindex="<?= ($l+1)?>">
+                           <?php foreach ($main as $lkey => $ldata): ?>
+                             <a href="#<?= $lkey ?>-options" class="list-group-item text-center" tabindex="<?= ($l+1)?>">
                                <h4 class="jicon <?= $ldata['icon'] ?>"></h4><br/><?= $ldata['label'] ?>
                              </a>
-                           <?php $l++; endforeach; unset($l); ?>
+                           <?php endforeach; ?>
                           </div>
                         </div>
                         <div class="col-sm-10 col-xs-9 java-tab">
-                        <?php $i=0; foreach ($main as $groupkey => $groups): ?>
-                            <div id="<?= $groupkey ?>-options" class="java-tab-content<?= ($i===0)?' active':'' ?>">
+                        <?php foreach ($main as $groupkey => $groups): ?>
+                            <div id="<?= $groupkey ?>-options" class="java-tab-content">
                                 <h2 class="java-tab-heading"><i class="jicon <?= $groups['icon'] ?>"></i> <strong><?= $groups['label'] ?></strong></h2>
                                 <fieldset id="<?= $groupkey ?>-set">
                                 <?php $builder->set_group($groupkey); ?>
@@ -37,7 +37,7 @@
                                 <?php java_actions('java_theme_config_fieldset_'.$groupkey, $groups); ?>
                                 </fieldset>
                             </div>
-                        <?php $i++; endforeach; unset($i); ?>
+                        <?php endforeach; ?>
                             <div class="form-submit">
                                 <?php java_actions('java_theme_config_buttons', $main); ?>
                                 <button type="reset" class="btn btn-default"><i class="jicon icon-renew"></i> <span>Reset</span></button>

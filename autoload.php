@@ -17,3 +17,5 @@ define('JAVAUPLOAD', FCPATH.'desa'.DS.'upload'.DS.'theme'.DS);
 if(function_exists('get_instance')) get_instance()->load->add_package_path(JAVAPATH);
 // Java Event listener required to load first.
 if(!class_exists('Java_events')) include_once(JAVAPATH.'/libraries/Java_events.php');
+// Java common function helper, need to load first for theme.
+if(!function_exists('java_config')) include_once(JAVAPATH.'/helpers/java_helper.php');

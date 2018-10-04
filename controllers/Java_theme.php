@@ -151,17 +151,22 @@ class Java_theme extends CI_Controller {
                     $image_data['rel_path'] = $relpath;
                 }
 
-                if ($is_image && $max_w>1 && $max_h>1) {
-                    $imgconf = array(
+                $this->load->library('image_lib');
+
+                if ($group == 'general' && $field == 'favicon') {
+                    $this->generate_favicon($image_data);
+                }
+                elseif ($is_image && $max_w>1 && $max_h>1) {
+
+                    $this->image_lib->initialize(array(
+                        'image_library'     => 'gd2',
                         'source_image'      => $image_data['full_path'],
-                        'new_image'         => 'favicon',
+                        'new_image'         => $image_data['full_path'],
                         'maintain_ratio'    => true,
                         'create_thumb'      => false,
-                        'quality'           => '80%',
                         'width'             => $max_w,
                         'height'            => $max_h
-                    );
-                    $this->load->library('image_lib', $config);
+                    ));
 
                     if (!$this->image_lib->resize()) {
                         throw new RuntimeException($this->image_lib->display_errors('',''));
@@ -176,11 +181,84 @@ class Java_theme extends CI_Controller {
                 );
 
             } catch (RuntimeException $e) {
-                $response['message'] = $e->getMessage() . $fullpath;
-            } catch (Exception $e) {}
+                $response['message'] = $e->getMessage();
+            } catch (Exception $e) {
+                log_message('error', $e->getMessage() ."\n". $e->getTraceAsString());
+            }
         }
 
         header('Content-type:application/json;charset=utf-8');
         echo json_encode($response); exit();
+    }
+
+    protected function generate_favicon($image)
+    {
+        // Apple Touch Icon
+        $this->image_lib->initialize(array(
+            'image_library'     => 'gd2',
+            'source_image'      => $image['full_path'],
+            'new_image'         => 'apple-touch-icon.png',
+            'maintain_ratio'    => true,
+            'width'             => 180,
+            'height'            => 180
+        ));
+        if (!$this->image_lib->resize()) {
+            throw new RuntimeException($this->image_lib->display_errors('',''));
+        }
+        $this->image_lib->clear();
+
+        // Microsoft Win 8 & 10 Tiles.
+        $this->image_lib->initialize(array(
+            'image_library'     => 'gd2',
+            'source_image'      => $image['full_path'],
+            'new_image'         => 'mstile-150x150.png',
+            'maintain_ratio'    => true,
+            'width'             => 150,
+            'height'            => 150
+        ));
+        if (!$this->image_lib->resize()) {
+            throw new RuntimeException($this->image_lib->display_errors('',''));
+        }
+        $this->image_lib->clear();
+
+        // 32x32 PNG Favicon
+        $this->image_lib->initialize(array(
+            'image_library'     => 'gd2',
+            'source_image'      => $image['full_path'],
+            'new_image'         => 'favicon-32x32.png',
+            'maintain_ratio'    => true,
+            'width'             => 32,
+            'height'            => 32
+        ));
+        if (!$this->image_lib->resize()) {
+            throw new RuntimeException($this->image_lib->display_errors('',''));
+        }
+        $this->image_lib->clear();
+
+        // 16x16 PNG Favicon
+        $this->image_lib->initialize(array(
+            'image_library'     => 'gd2',
+            'source_image'      => $image['full_path'],
+            'new_image'         => 'favicon-16x16.png',
+            'maintain_ratio'    => true,
+            'width'             => 16,
+            'height'            => 16
+        ));
+        if (!$this->image_lib->resize()) {
+            throw new RuntimeException($this->image_lib->display_errors('',''));
+        }
+        $this->image_lib->clear();
+
+        /**
+         * Generate favicon for old browser (.ico)
+         */
+        $this->load->library('java_ico', $image['full_path']);
+        $resultico = $this->java_ico->save_ico($image['file_path'].'favicon.ico');
+
+        if ($resultico === false || !file_exists($image['file_path'].'favicon.ico')) {
+            //throw new RuntimeException('Gagal membuat favicon.ico');
+        }
+
+        return $this;
     }
 }
