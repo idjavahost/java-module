@@ -7,6 +7,8 @@
  * @copyright   PT. Java Digital Nusantara © 2018
  */
 
+setlocale(LC_ALL, 'id_ID');
+
 // Base constant
 define('JAVAPATH', __DIR__);
 define('JAVADIR', 'vendor/java');

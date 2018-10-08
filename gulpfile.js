@@ -12,6 +12,7 @@
  * - Checkbox Toggle : http://www.bootstraptoggle.com/
  * - File Uploader : https://danielmg.org/demo/java-script/uploader
  * - Slider : https://github.com/seiyria/bootstrap-slider
+ * - Sortable : https://github.com/RubaXa/Sortable
  */
 
 var dir_node = './node_modules',

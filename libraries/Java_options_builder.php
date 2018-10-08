@@ -362,4 +362,61 @@ class Java_options_builder {
         $html .= '</div>';
         return $html;
     }
+
+    public function render_widgets(array $data)
+    {
+        $source = !isset($data['source']) ? 'widget' : trim($data['source']);
+        $val = isset($data['value']) ? $data['value'] : (isset($data['default'])?$data['default']:'');
+        $id = $this->_groupId.'-'.$data['id'];
+        $availables = java_get_widgets();
+        $active = empty($val) ? array() : (!is_array($val) ? explode(',', $val) : $val);
+
+        $attrs = array(
+            'type'  => 'hidden',
+            'name'  => $this->_groupId.'['.$data['id'].']',
+            'value' => $val
+        );
+
+        $activehtml = '<ul id="'.$id.'-ac" class="sort-active">';
+        foreach ($active as $itemid) {
+            $avkey = java_array_search($itemid, $availables);
+            if ($avkey === null) continue;
+            $item = $availables[ $avkey ];
+            $activehtml .= '<li class="item" data-id="'.$item['id'].'" data-desc="'.htmlentities($item['desc'],ENT_QUOTES).'">';
+            $activehtml .= '<span class="item-block">';
+            if (!empty($item['icon'])) $activehtml .= '<i class="'.$item['icon'].'"></i>';
+            $activehtml .= '<span>'.$item['name'].'</span>';
+            $activehtml .= '</span>';
+            $activehtml .= '<span class="item-tools"><i class="fa fa-times item-remove"></i><i class="fa fa-caret-down item-detail"></i></span>';
+            $activehtml .= '<div class="details" style="display:none">'.htmlentities($item['desc'],ENT_QUOTES);
+            $activehtml .= '</div>';
+            $activehtml .= '</li>';
+            unset($availables[ $avkey ]);
+        }
+        $activehtml .= '</ul><!-- .sort-active -->';
+
+        $avahtml = '<ul id="'.$id.'-av" class="sort-available">';
+        foreach ($availables as $wkey => $widget) {
+            $avahtml .= '<li class="item" data-id="'.$wkey.'" data-desc="'.htmlentities($widget['desc'],ENT_QUOTES).'">';
+            $avahtml .= '<span class="item-block">';
+            if (!empty($widget['icon'])) $avahtml .= '<i class="'.$widget['icon'].'"></i>';
+            $avahtml .= '<span>'.$widget['name'].'</span>';
+            $avahtml .= '</span>';
+            $avahtml .= '</li>';
+        }
+        $avahtml .= '</ul><!-- .sort-available -->';
+
+        $html  = '<div id="'.$id.'" class="sortable-component row">';
+        $html .= '<div class="col-xs-4">';
+        $html .= '<h5 class="head">Tersedia</h5>';
+        $html .= $avahtml;
+        $html .= '</div>';
+        $html .= '<div class="col-xs-8">';
+        $html .= '<h5 class="head">Aktif</h5>';
+        $html .= $activehtml;
+        $html .= java_build_html('input', $attrs);
+        $html .= '</div>';
+        $html .= '</div>';
+        return $html;
+    }
 }

@@ -59,6 +59,8 @@ class Java_theme_config {
                 if (!isset($dbval->config_value)) continue;
                 if (java_is_serialize($dbval->config_value)) {
                     $dbdataval = unserialize($dbval->config_value);
+                } elseif (java_is_json($dbval->config_value)) {
+                    $dbdataval = json_decode($dbval->config_value, true);
                 } elseif (is_numeric($dbval->config_value)) {
                     $dbdataval = (int)$dbval->config_value;
                 } else {
@@ -82,15 +84,15 @@ class Java_theme_config {
                 if (!(isset($a['order']) && isset($b['order']))) return 1;
                 return isset($a['order']) && isset($b['order']) && ($a['order'] > $b['order']);
             });
-            foreach ($groupdata['fields'] as &$data) {
-                $dbkey = "$groupkey/".$data['id'];
-                if (isset($dbdata[ $dbkey ])) {
-                    $data['value'] = $dbdata[ $dbkey ];
+            foreach ($groupdata['fields'] as $ky => $data) {
+                $datavalue = null;
+                $dbkey = trim("$groupkey/".$data['id']);
+                if (array_key_exists($dbkey, $dbdata)) {
+                    $datavalue = $dbdata[ $dbkey ];
                 } elseif (isset($data['default'])) {
-                    $data['value'] = $data['default'];
-                } else {
-                    $data['value'] = null;
+                    $datavalue = trim($data['default']);
                 }
+                $groupdata['fields'][ $ky ]['value'] = $datavalue;
             }
         }
         return $options;
@@ -98,6 +100,7 @@ class Java_theme_config {
 
     public function save_config(array $configs)
     {
+        $this->CI->db->db_debug = FALSE;
         $this->_last_error = null;
         $dbdata = $this->get_values();
         $updates = array();
@@ -106,20 +109,20 @@ class Java_theme_config {
         try {
             foreach ($configs as $group => $fields) {
                 foreach ($fields as $key => $value) {
-                    $dbkey = $group.'/'.$key;
+                    $dbkey = trim($group.'/'.$key);
                     if (is_array($value)) {
                         $value = implode(',', $value);
                     }
-                    if (isset($dbdata[ $dbkey ])) {
+                    if (array_key_exists($dbkey, $dbdata)) {
                         if ($dbdata[ $dbkey ] != $value) {
-                            $updates[] = array(
+                            $updates[ $dbkey ] = array(
                                 'config_key' => $dbkey,
                                 'config_value' => $value,
                                 'update' => date('Y-m-d H:i:s')
                             );
                         }
                     } else {
-                        $inserts[] = array(
+                        $inserts[ $dbkey ] = array(
                             'config_key' => $dbkey,
                             'config_value' => $value
                         );
@@ -132,6 +135,10 @@ class Java_theme_config {
 
             if (!empty($inserts))
                 $this->CI->db->insert_batch('java_config', $inserts);
+
+            if (($sqlerr = $this->CI->db->error()) && !empty($sqlerr['message'])) {
+                throw new Exception($sqlerr['message']);
+            }
 
             return true;
 

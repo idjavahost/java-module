@@ -12,7 +12,7 @@
 	</section>
 	<section class="content" id="maincontent">
         <form id="java-options-form" action="<?= base_url() ?>java_theme/save" method="post" class="form-horizontal">
-            <div class="container">
+            <div class="container-fluid">
             	<div class="row">
                     <div class="col-lg-8 col-md-10 java-tab-container is-loading">
                         <div class="col-xs-12 message-wrap"></div>

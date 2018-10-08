@@ -68,6 +68,25 @@ $config['general'] = java_filters('java_theme_config_general', array(
     )
 ));
 
+$config['footer'] = java_filters('java_theme_config_footer', array(
+    'label'   => 'Footer',
+    'icon'    => 'icon-widgets',
+    'order'   => 20,
+    'fields'  => array(
+        array(
+            'id' => 'copyright',
+            'label' => 'Tambahan Teks',
+            'help' => 'Tambahan teks untuk footer copyright.'
+        ),
+        array(
+            'id' => 'widgets',
+            'label' => 'Footer Widgets',
+            'help' => 'Atur, urut, dan sesuaikan widget untuk bagian footer.',
+            'type' => 'widgets'
+        ),
+    )
+));
+
 $config['sidebar'] = java_filters('java_theme_config_sidebar', array(
     'label'   => 'Sidebar',
     'icon'    => 'icon-sidebar',
@@ -77,6 +96,7 @@ $config['sidebar'] = java_filters('java_theme_config_sidebar', array(
             'id' => 'sidebar_pos',
             'label' => 'Posisi Sidebar',
             'help' => 'Tentukan posisi sidebar ketika berada di desktop.',
+            'order' => 10,
             'type' => 'select',
             'default' => 'kiri',
             'options' => array(
@@ -85,10 +105,21 @@ $config['sidebar'] = java_filters('java_theme_config_sidebar', array(
             )
         ),
         array(
+            'id' => 'search',
+            'label' => 'Tampilkan Pencarian',
+            'type' => 'toggle',
+            'order' => 20,
+            'value' => '1',
+            'default' => '1',
+            'options' => array('on' => 'Ya', 'off' => 'Tidak'),
+            'help' => 'Tampilkan bidang pencarian di sidebar.'
+        ),
+        array(
             'id' => 'config',
+            'order' => 30,
             'label' => 'Sidebar Artikel',
             'help' => 'Atur, urut, dan sesuaikan widget untuk sidebar kanan atau kiri di semua halaman artikel.',
-            'type' => 'sidebar'
+            'type' => 'widgets'
         ),
     )
 ));

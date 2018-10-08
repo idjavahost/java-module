@@ -7,6 +7,11 @@
  * @copyright   PT. Java Digital Nusantara © 2018
  */
 
+/**
+ * Get current active theme.
+ *
+ * @return string
+ */
 function java_theme() {
     $CI =& get_instance();
     $CI->db->where('key','web_theme');
@@ -19,12 +24,24 @@ function java_theme() {
     return $theme;
 }
 
+/**
+ * Get theme options value.
+ *
+ * @param  string $field "groupname/fieldname"
+ * @return mixed
+ */
 function java_config($field) {
     $CI =& get_instance();
     $CI->load->library('java_theme_config');
     return $CI->java_theme_config->get_config($field);
 }
 
+/**
+ * Check if variable is serialized array/
+ *
+ * @param  mixed  $data
+ * @return boolean
+ */
 function java_is_serialize($data) {
     if ( !is_string( $data ) )
         return false;
@@ -50,6 +67,24 @@ function java_is_serialize($data) {
     return false;
 }
 
+/**
+ * Check if string is json string.
+ *
+ * @param  mixed  $string
+ * @return boolean
+ */
+function java_is_json($string) {
+    @json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+/**
+ * Build HTML tag.
+ *
+ * @param  string $tag
+ * @param  array  $attrs
+ * @return string
+ */
 function java_build_html($tag, $attrs = array(), $closure = false) {
     $html = "<$tag";
     if (!empty($attrs)) {
@@ -65,7 +100,11 @@ function java_build_html($tag, $attrs = array(), $closure = false) {
     return $html;
 }
 
-
+/**
+ * Get default PHP ma upload size.
+ *
+ * @return string
+ */
 function java_file_upload_max_size() {
     static $max_size = -1;
     if ($max_size < 0) {
@@ -81,6 +120,12 @@ function java_file_upload_max_size() {
     return $max_size;
 }
 
+/**
+ * Parse size string from php.ini
+ *
+ * @param  string $size
+ * @return integer
+ */
 function java_parse_size($size) {
     $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
     $size = preg_replace('/[^0-9\.]/', '', $size);
@@ -91,16 +136,51 @@ function java_parse_size($size) {
     }
 }
 
+/**
+ * Format numeric to byte calculations.
+ *
+ * @param  integer  $size
+ * @param  integer $precision
+ * @return string
+ */
 function java_format_byte($size, $precision = 2) {
     $base = log($size, 1024);
     $suffixes = array('B', 'KB', 'MB', 'GG', 'TB');
     return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)];
 }
 
+/**
+ * Search array inside multidimensional array.
+ *
+ * @param  string $id
+ * @param  array $array
+ * @param  string $field
+ * @return mixed
+ */
+function java_array_search($id, $array, $field = 'id') {
+    foreach ($array as $k => $item) {
+        if ($item[ $field ] === $id) {
+            return $k;
+        }
+    }
+    return null;
+}
+
+/**
+ * Shorthand to get upload URL by theme options.
+ *
+ * @param  string $relpath
+ * @return string
+ */
 function java_upload_url($relpath) {
     return base_url().'desa/upload/theme/'.$relpath;
 }
 
+/**
+ * Get all articles categories.
+ *
+ * @return array
+ */
 function java_get_article_categories() {
     $CI =& get_instance();
     $cats = array();
@@ -108,7 +188,6 @@ function java_get_article_categories() {
         if (!empty($cat) && $cat->enabled == 1)
             $cats[ $cat->id ] = $cat->kategori;
     }
-    log_message('error', print_r($cats,true));
     return $cats;
 }
 
@@ -133,8 +212,12 @@ function java_file_data($file, $headers) {
     return $headers;
 }
 
+/**
+ * Get all available widgets from theme.
+ *
+ * @return array
+ */
 function java_get_widgets() {
-    $CI =& get_instance();
     $widgets = array();
     $paths = FCPATH.'themes/'.java_theme().'/widgets';
     if (!is_dir($paths)) return $widgets;
@@ -146,6 +229,27 @@ function java_get_widgets() {
         $widgets[ $wdata['id'] ] = $wdata;
     }
     return $widgets;
+}
+
+function java_get_home_articles() {
+    $CI =& get_instance();
+    $ex_headline = (java_config('homepage/show_headline') !== '1');
+    $limit = 6;
+    $excludes = explode(',', java_config('homepage/excludes'));
+    $excludes[] = '999';
+    $comq = "
+    SELECT COUNT(*) FROM komentar WHERE komentar.id_artikel = a.id AND komentar.enabled = '1'
+    ";
+    $CI->db->select(array('a.*', '('.$comq.') AS komentar', 'u.nama AS owner', 'k.kategori AS kategori', ''));
+    $CI->db->join('user u', 'a.id_user = u.id', 'left');
+    $CI->db->join('kategori k', 'a.id_kategori = k.id', 'left');
+    $CI->db->where('a.enabled', '1');
+    $CI->db->where('a.tgl_upload <', date('Y-m-d H:i:s'));
+    $CI->db->where_not_in('a.id_kategori', $excludes);
+    if ($ex_headline) $CI->db->where('a.headline <>', '1');
+    $CI->db->limit($limit);
+    $CI->db->order_by('a.tgl_upload', 'DESC');
+    return $CI->db->get('artikel a')->result_array();
 }
 
 
