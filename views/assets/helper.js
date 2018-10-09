@@ -82,9 +82,24 @@ var triggerPlugins = function(id) {
         el.dmUploader(defaults);
     });
 
+    var selectOptions = {width: '100%'};
+    var selectRenderer = function(state) {
+        if(!state.id) return state.text;
+        return '<i class="'+ state.element.value.toLowerCase() +' fa-fw" style="color:#5f5aa6"></i> &nbsp;<span>'+ state.text +'</span>';
+    };
+    var selectMarkup = function(option) { return option; };
     $(wrap+' select.select-control').each(function(i,select) {
+        if ($(select).hasClass('icon-select')) {
+            selectOptions.templateResult = selectRenderer;
+            selectOptions.templateSelection = selectRenderer;
+            selectOptions.escapeMarkup = selectMarkup;
+        } else {
+            delete selectOptions.escapeMarkup;
+            delete selectOptions.templateResult;
+            delete selectOptions.templateSelection;
+        }
         if (!$(select).hasClass('select2-hidden-accessible')) {
-            setTimeout(function(){ $(select).select2(); }, 0);
+            setTimeout(function(){ $(select).select2(selectOptions); }, 0);
         }
     });
 
@@ -121,11 +136,11 @@ var triggerPlugins = function(id) {
                         input.val(actSort.toArray().toString());
                     }
                     else if (ctrl.hasClass('item-detail')) {
-                        $(evt.item).find('.details').slideToggle('fast');
+                        $(evt.item).toggleClass('collapse');
                     }
                 },
                 onAdd: function (evt) {
-                    var itemEl = $(evt.item);
+                    var itemEl = $(evt.item).addClass('collapse');
                     if (!itemEl.find('.item-tools').length) {
                         itemEl.append('<span class="item-tools"><i class="fa fa-times item-remove"></i><i class="fa fa-caret-down item-detail"></i></span>');
                     }

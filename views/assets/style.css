@@ -486,6 +486,16 @@ div.java-tab-container .message-wrap .alert {
 #java-options-form .sortable-component .sort-active > .item {
     text-align: left;
     background-color: #f1f1f1;
+    max-height: 40px;
+    overflow: hidden;
+    -webkit-transition: max-height .4s ease-out;
+    transition: max-height .4s ease-out;
+}
+
+#java-options-form .sortable-component .sort-active > .item.collapse {
+    max-height: 900px;
+    -webkit-transition: max-height .4s ease-in;
+    transition: max-height .4s ease-in;
 }
 
 #java-options-form .sortable-component .sort-active > .item > .item-block > i {

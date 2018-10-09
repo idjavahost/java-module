@@ -38,7 +38,7 @@ var config = {
             'Chrome >= 45',
             'Firefox ESR',
             'Edge >= 12',
-            'Explorer >= 10',
+            'Explorer >= 9',
             'iOS >= 9',
             'Safari >= 9'
         ]

@@ -210,6 +210,24 @@ class Java_options_builder {
         return java_build_html('textarea', $attrs, $value);
     }
 
+    public function render_icon_select(array $data)
+    {
+        $this->CI->load->helper('java_awesome');
+
+        if (!function_exists('java_fa5_icons')) {
+            return '';
+        }
+
+        $data['options']        = java_fa5_icons();
+        $data['xclass']         = 'icon-select';
+        $data['select_options'] = array(
+            'placeholder' => 'Pilih ikon...',
+            'minimum-results-for-search' => '1'
+        );
+
+        return $this->render_select($data);
+    }
+
     public function render_select(array $data)
     {
         if (!isset($data['options'])) {
@@ -221,6 +239,9 @@ class Java_options_builder {
             'id'            => $this->_groupId.'-'.$data['id'],
             'class'         => 'form-control select-control'
         );
+        if (isset($data['xclass']) && trim($data['xclass'])) {
+            $attrs['class'] .= ' '.trim(htmlspecialchars($data['xclass'], ENT_QUOTES));
+        }
         if (isset($data['multiple']) && $data['multiple']===true) {
             $attrs['multiple'] = 'multiple';
             $attrs['name'] = $this->_groupId.'['.$data['id'].'][]';
@@ -388,7 +409,7 @@ class Java_options_builder {
             $activehtml .= '<span>'.$item['name'].'</span>';
             $activehtml .= '</span>';
             $activehtml .= '<span class="item-tools"><i class="fa fa-times item-remove"></i><i class="fa fa-caret-down item-detail"></i></span>';
-            $activehtml .= '<div class="details" style="display:none">'.htmlentities($item['desc'],ENT_QUOTES);
+            $activehtml .= '<div class="details">'.htmlentities($item['desc'],ENT_QUOTES);
             $activehtml .= '</div>';
             $activehtml .= '</li>';
             unset($availables[ $avkey ]);

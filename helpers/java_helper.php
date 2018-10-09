@@ -231,6 +231,11 @@ function java_get_widgets() {
     return $widgets;
 }
 
+/**
+ * Get homepage articles.
+ *
+ * @return array
+ */
 function java_get_home_articles() {
     $CI =& get_instance();
     $ex_headline = (java_config('homepage/show_headline') !== '1');
@@ -250,6 +255,25 @@ function java_get_home_articles() {
     $CI->db->limit($limit);
     $CI->db->order_by('a.tgl_upload', 'DESC');
     return $CI->db->get('artikel a')->result_array();
+}
+
+/**
+ * Get all article categories.
+ *
+ * @return array
+ */
+function java_get_categories($tipe = null) {
+    $CI =& get_instance();
+    $CI->db->select(array('id', 'kategori'));
+    if ($tipe !== null) $CI->db->where('tipe', $tipe);
+    $categories = $CI->db->get('kategori')->result_array();
+    $cats = array();
+    foreach ($categories as $cat) {
+        if (!empty($cat['id']) && !empty($cat['kategori'])) {
+            $cats[ intval($cat['id']) ] = trim($cat['kategori']);
+        }
+    }
+    return $cats;
 }
 
 
