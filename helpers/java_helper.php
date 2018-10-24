@@ -69,52 +69,12 @@ function register_shortcode($tagname, $func) {
 }
 
 /**
- * Register shortcode [contact_form]
+ * Artikel Content filter
+ *
+ * @param  array $artikel
+ * @return string
  */
-register_shortcode('contact_form', function ($artikel) {
-    if (java_config_flag('contact/enable')) {
-        $ci = &get_instance();
-        $template = str_replace('layouts/artikel.tpl.php', 'partials/contact.php', $ci->template);
-        $ci->load->view($template, array('artikel' => $artikel));
-    }
-});
-
-/**
- * Register shortcode [disable_meta]
- */
-register_shortcode('disable_meta', function ($artikel) {
-    $CI =& get_instance();
-    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
-        $CI->load->library('java_theme_config');
-    }
-    $CI->java_theme_config->set_config('artikel/show_author', '0');
-    $CI->java_theme_config->set_config('artikel/show_date', '0');
-    $CI->java_theme_config->set_config('artikel/show_cats', '0');
-});
-
-/**
- * Register shortcode [disable_share]
- */
-register_shortcode('disable_share', function ($artikel) {
-    $CI =& get_instance();
-    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
-        $CI->load->library('java_theme_config');
-    }
-    $CI->java_theme_config->set_config('artikel/show_share', '0');
-});
-
-/**
- * Register shortcode [disable_comment]
- */
-register_shortcode('disable_comment', function ($artikel) {
-    $CI =& get_instance();
-    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
-        $CI->load->library('java_theme_config');
-    }
-    $CI->java_theme_config->set_config('artikel/show_comment', '0');
-});
-
-function java_get_content($artikel) {
+function java_get_content(array $artikel) {
     global $shortcodes;
     $content = isset($artikel['isi']) ? trim($artikel['isi']) : '';
     if (!empty($content) && strpos($content, '[') !== false) {
@@ -519,10 +479,8 @@ Email ini dikirimkan melalui form kontak dari aplikasi OpenSID.
 
 /**
  * HTML Head content.
- *
- * @return void
  */
-function java_theme_head() {
+java_action('java_theme_head', function () {
 
     if ($favicon = java_config('general/favicon')) {
         $icopath = base_url().'desa/upload/theme/icon/';
@@ -555,16 +513,12 @@ function java_theme_head() {
     if ($twauth = java_config('seo/twitter_creator')) {
         echo '<meta name="twitter:creator" content="@'.trim($twauth,'@').'">';
     }
-}
-java_action('java_theme_head', 'java_theme_head');
+});
 
 /**
  * Page title modifications.
- *
- * @param  string $title
- * @return string
  */
-function java_theme_page_title($title) {
+java_filter('java_theme_page_title', function ($title) {
     if ($prefix = java_config('seo/title_prefix')) {
         $title = trim($prefix) . ' ' . $title;
     }
@@ -572,33 +526,88 @@ function java_theme_page_title($title) {
         $title = $title . ' ' . trim($suffix);
     }
     return $title;
-}
-java_filter('java_theme_page_title', 'java_theme_page_title');
+});
 
 /**
  * Page meta keywords modifications.
- *
- * @param  string $keyword
- * @return string
  */
-function java_theme_meta_keyword($keyword) {
+java_filter('java_theme_meta_keyword', function ($keyword) {
     if ($xword = java_config('seo/keyword')) {
         $keyword = trim($xword) . ', ' . $keyword;
     }
     return $keyword;
-}
-java_filter('java_theme_meta_keyword', 'java_theme_meta_keyword');
+});
 
 /**
  * Page meta description modifications.
- *
- * @param  string $description
- * @return string
  */
-function java_theme_meta_description($description) {
+java_filter('java_theme_meta_description', function ($description) {
     if ($xdesc = java_config('seo/description')) {
         $description = trim(htmlspecialchars($xdesc, ENT_QUOTES));
     }
     return $description;
-}
-java_filter('java_theme_meta_description', 'java_theme_meta_description');
+});
+
+/**
+ * Single article content filter.
+ */
+java_action('java_theme_artikel_before', function ($artikel) {
+    if (isset($artikel['id_kategori']) && $artikel['id_kategori'] == '999') {
+        $CI =& get_instance();
+        $CI->java_theme_config->set_config('artikel/show_author', '0');
+        $CI->java_theme_config->set_config('artikel/show_date', '0');
+        $CI->java_theme_config->set_config('artikel/show_cats', '0');
+        $CI->java_theme_config->set_config('artikel/show_share', '0');
+        $CI->java_theme_config->set_config('artikel/show_comment', '0');
+    }
+});
+
+/** ================================================================= */
+/**   * REGISTER SHORTCODE                                            */
+/** ================================================================= */
+
+/**
+ * Register shortcode [contact_form]
+ */
+register_shortcode('contact_form', function ($artikel) {
+    if (java_config_flag('contact/enable')) {
+        $ci = &get_instance();
+        $template = str_replace('layouts/artikel.tpl.php', 'partials/contact.php', $ci->template);
+        $ci->load->view($template, array('artikel' => $artikel));
+    }
+});
+
+/**
+ * Register shortcode [disable_meta]
+ */
+register_shortcode('disable_meta', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_author', '0');
+    $CI->java_theme_config->set_config('artikel/show_date', '0');
+    $CI->java_theme_config->set_config('artikel/show_cats', '0');
+});
+
+/**
+ * Register shortcode [disable_share]
+ */
+register_shortcode('disable_share', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_share', '0');
+});
+
+/**
+ * Register shortcode [disable_comment]
+ */
+register_shortcode('disable_comment', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_comment', '0');
+});

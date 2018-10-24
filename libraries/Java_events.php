@@ -58,7 +58,15 @@ class Java_events {
 	 */
 	public static function register($type, $event, $callback)
 	{
-        $key = is_array($callback) ? get_class($callback[0]).'::'.$callback[1] : trim($callback);
+        if (is_array($callback) && isset($callback[1])) {
+            $key = get_class($callback[0]).'::'.$callback[1];
+        } elseif (is_object($callback)) {
+            $key = get_class($callback);
+        } elseif (is_callable($callback)) {
+            $key = uniqid($type.'-');
+        } else {
+            $key = trim($callback);
+        }
 
         switch ($type) {
             case 'filter':
