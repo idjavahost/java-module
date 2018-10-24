@@ -32,7 +32,9 @@ function java_theme() {
  */
 function java_config($field) {
     $CI =& get_instance();
-    $CI->load->library('java_theme_config');
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
     return $CI->java_theme_config->get_config($field);
 }
 
@@ -47,6 +49,13 @@ function java_config_flag($field) {
     return (bool) $val;
 }
 
+/**
+ * Register new article shortcodes.
+ *
+ * @param  string $tagname
+ * @param  string|object $func
+ * @return boolean
+ */
 function register_shortcode($tagname, $func) {
     global $shortcodes;
     if (!is_array($shortcodes)) {
@@ -59,12 +68,50 @@ function register_shortcode($tagname, $func) {
     return false;
 }
 
+/**
+ * Register shortcode [contact_form]
+ */
 register_shortcode('contact_form', function ($artikel) {
     if (java_config_flag('contact/enable')) {
         $ci = &get_instance();
         $template = str_replace('layouts/artikel.tpl.php', 'partials/contact.php', $ci->template);
         $ci->load->view($template, array('artikel' => $artikel));
     }
+});
+
+/**
+ * Register shortcode [disable_meta]
+ */
+register_shortcode('disable_meta', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_author', '0');
+    $CI->java_theme_config->set_config('artikel/show_date', '0');
+    $CI->java_theme_config->set_config('artikel/show_cats', '0');
+});
+
+/**
+ * Register shortcode [disable_share]
+ */
+register_shortcode('disable_share', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_share', '0');
+});
+
+/**
+ * Register shortcode [disable_comment]
+ */
+register_shortcode('disable_comment', function ($artikel) {
+    $CI =& get_instance();
+    if (!class_exists('Java_theme_config') || !isset($CI->java_theme_config)) {
+        $CI->load->library('java_theme_config');
+    }
+    $CI->java_theme_config->set_config('artikel/show_comment', '0');
 });
 
 function java_get_content($artikel) {

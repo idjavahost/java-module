@@ -24,6 +24,14 @@ class Java_theme_config {
         $this->CI->config->load('java_theme', true);
     }
 
+    public function set_config($key, $value)
+    {
+        if (isset($this->_values[ $key ]) ) {
+            $this->_values[ $key ] = $value;
+        }
+        return $this;
+    }
+
     public function get_config($key)
     {
         $configs = $this->get_values();
