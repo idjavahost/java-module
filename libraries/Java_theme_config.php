@@ -29,6 +29,22 @@ class Java_theme_config {
         $configs = $this->get_values();
         if (array_key_exists($key, $configs)) {
             return $configs[ $key ];
+        } else {
+            $options = $this->get_configs();
+            $keys = explode('/', $key);
+            if (
+                isset($options[ $keys[0] ]) &&
+                isset($options[ $keys[0] ]['values']) &&
+                isset($options[ $keys[0] ]['values'][ $keys[1] ])
+            ) {
+                $value = $options[ $keys[0] ]['values'][ $keys[1] ];
+                if (is_numeric($value)) {
+                    $value = (int)$value;
+                } else {
+                    $value = trim($value);
+                }
+                return $value;
+            }
         }
         return null;
     }
@@ -93,6 +109,7 @@ class Java_theme_config {
                     $datavalue = trim($data['default']);
                 }
                 $groupdata['fields'][ $ky ]['value'] = $datavalue;
+                $groupdata['values'][ $data['id'] ] = $datavalue;
             }
         }
         return $options;
@@ -102,18 +119,22 @@ class Java_theme_config {
     {
         $this->CI->db->db_debug = FALSE;
         $this->_last_error = null;
-        $dbdata = $this->get_values();
+        $options = $this->get_configs();
+        $dbdata  = $this->get_values();
         $updates = array();
         $inserts = array();
 
         try {
-            foreach ($configs as $group => $fields) {
-                foreach ($fields as $key => $value) {
-                    $dbkey = trim($group.'/'.$key);
-                    if (is_array($value)) {
-                        $value = implode(',', $value);
+            foreach ($options as $groupid => &$group) {
+                if (!isset($configs[ $groupid ])) continue;
+                foreach ($group['fields'] as $field) {
+                    if (!isset($configs[ $groupid ][ $field['id'] ])) {
+                        if (!in_array($field['type'], array('toggle','checkbox','switch'))) continue;
+                        $configs[ $groupid ][ $field['id'] ] = '0';
                     }
-                    if (array_key_exists($dbkey, $dbdata)) {
+                    $value = trim($configs[ $groupid ][ $field['id'] ]);
+                    $dbkey = trim($groupid.'/'.$field['id']);
+                    if (array_key_exists($dbkey, $dbdata) && !isset($updates[ $dbkey ])) {
                         if ($dbdata[ $dbkey ] != $value) {
                             $updates[ $dbkey ] = array(
                                 'config_key' => $dbkey,
@@ -121,7 +142,7 @@ class Java_theme_config {
                                 'update' => date('Y-m-d H:i:s')
                             );
                         }
-                    } else {
+                    } elseif (!isset($inserts[ $dbkey ])) {
                         $inserts[ $dbkey ] = array(
                             'config_key' => $dbkey,
                             'config_value' => $value

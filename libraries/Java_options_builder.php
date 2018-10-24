@@ -134,10 +134,10 @@ class Java_options_builder {
         return $html;
     }
 
-    public function render_text(array $data)
+    public function render_text(array $data, $type = 'text')
     {
         $attrs = array(
-            'type'          => 'text',
+            'type'          => $type,
             'value'         => isset($data['value']) ? $data['value'] : (isset($data['default'])?$data['default']:''),
             'name'          => $this->_groupId.'['.$data['id'].']',
             'id'            => $this->_groupId.'-'.$data['id'],
@@ -155,6 +155,11 @@ class Java_options_builder {
             return $html;
         }
         return java_build_html('input', $attrs);
+    }
+
+    public function render_email(array $data)
+    {
+        return $this->render_text($data, 'email');
     }
 
     public function render_textarea(array $data)
