@@ -1,0 +1,10 @@
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * JavaHost OpenSID Module.
+ *
+ * @since       0.0.1
+ * @author      Rizal Fauzie <rizal@fauzie.my.id>
+ * @copyright   PT. Java Digital Nusantara © 2018
+ */
+
+include_once FCPATH.'vendor/java/controllers/Java_theme.php';
