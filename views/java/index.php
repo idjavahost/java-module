@@ -1,6 +1,16 @@
 <?php if (!defined('JAVAPATH')) exit('No direct script access allowed'); ?>
-<link rel="stylesheet" href="<?= base_url().JAVADIR ?>/views/assets/style.min.css?ver=<?= time() ?>">
-<script type="text/javascript" src="<?= base_url().JAVADIR ?>/views/assets/script.min.js?ver=<?= time() ?>"></script>
+<?php
+$assetVer  = (ENVIRONMENT=='development') ? time() : '1.0.0';
+$scriptUrl = base_url() . JAVADIR . '/views/assets/script.min.js?ver='.$assetVer;
+?>
+<link rel="stylesheet" href="<?= base_url().JAVADIR ?>/views/assets/style.min.css?ver=<?= $assetVer ?>">
+<script type="text/javascript">
+window.onload = function() {
+    var script = document.createElement('script');
+    script.src = '<?= $scriptUrl ?>';
+    document.body.appendChild(script);
+};
+</script>
 <?php java_actions('java_theme_config_header', $main); ?>
 <div class="content-wrapper">
 	<section class="content-header">
